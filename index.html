@@ -2,132 +2,150 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Course Recommendation System</title>
-
+<title>Personalized Course Selection System</title>
 <style>
-body { font-family: Arial; background:#f2f4f7; }
+body {
+ font-family: Arial, sans-serif;
+ background: #f2f4f7;
+}
 .container {
-    width: 420px; margin: 40px auto;
-    background:#fff; padding:25px;
-    border-radius:8px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
+ width: 420px;
+ margin: 40px auto;
+ background: #fff;
+ padding: 25px;
+ border-radius: 8px;
+ box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+h2 {
+ text-align: center;
+}
+label {
+ font-weight: bold;
+ margin-top: 10px;
+display: block;
 }
 input, select {
-    width:100%; padding:8px; margin-top:5px;
+ width: 100%;
+ padding: 8px;
+ margin-top: 5px;
 }
 button {
-    width:100%; margin-top:15px; padding:10px;
-    background:#007bff; color:white; border:none;
+ width: 100%;
+ margin-top: 15px;
+ padding: 10px;
+ background: #007bff;
+color: white;
+ border: none;
+ cursor: pointer;
 }
-.link { text-align:center; color:blue; cursor:pointer; }
-#result { margin-top:15px; color:green; text-align:center; }
+button:hover {
+ background: #0056b3;
+}
+.link {
+ text-align: center;
+ margin-top: 10px;
+color: blue;
+ cursor: pointer;
+}
+#result {
+margin-top: 15px;
+color: green;
+ font-weight: bold;
+ text-align: center;
+}
 </style>
 </head>
-
 <body>
-
 <!-- LOGIN -->
 <div class="container" id="loginBox">
 <h2>Login</h2>
-<input type="text" id="loginUser" placeholder="Username">
-<input type="password" id="loginPass" placeholder="Password">
+<label>Username</label>
+<input type="text" id="loginUser">
+<label>Password</label>
+<input type="password" id="loginPass">
 <button onclick="login()">Login</button>
 <div class="link" onclick="showSignup()">New user? Sign up</div>
 </div>
-
-<!-- SIGNUP -->
+<!-- SIGN UP -->
 <div class="container" id="signupBox" style="display:none;">
 <h2>Sign Up</h2>
-<input type="text" id="signupUser" placeholder="Username">
-<input type="password" id="signupPass" placeholder="Password">
+<label>Username</label>
+<input type="text" id="signupUser">
+<label>Password</label>
+<input type="password" id="signupPass">
 <button onclick="signup()">Create Account</button>
-<div class="link" onclick="showLogin()">Already have account?</div>
+<div class="link" onclick="showLogin()">Already have an account?</div>
 </div>
-
 <!-- COURSE FORM -->
 <div class="container" id="courseBox" style="display:none;">
 <h2>Course Selection</h2>
-<input type="text" id="name" placeholder="Full Name">
-<input type="email" id="email" placeholder="Email">
-
+<label>Full Name</label>
+<input type="text" id="name">
+<label>Email</label>
+<input type="email" id="email">
+<label>Skill Level</label>
 <select id="skill">
 <option>Beginner</option>
 <option>Intermediate</option>
 <option>Advanced</option>
 </select>
-
+<label>Interest Area</label>
 <select id="interest">
 <option>Programming</option>
 <option>Data Science</option>
 <option>Web Development</option>
 <option>AI & ML</option>
 </select>
-
-<input type="text" id="goal" placeholder="Career Goal">
-
+<label>Career Goal</label>
+<input type="text" id="goal">
 <button onclick="recommend()">Get Recommendation</button>
 <div id="result"></div>
 </div>
-
 <script>
-function showSignup(){
-loginBox.style.display="none";
-signupBox.style.display="block";
+function showSignup() {
+loginBox.style.display = "none";
+signupBox.style.display = "block";
 }
-function showLogin(){
-signupBox.style.display="none";
-loginBox.style.display="block";
+function showLogin() {
+signupBox.style.display = "none";
+loginBox.style.display = "block";
 }
-
-function signup(){
-fetch("signup.php",{
-method:"POST",
-headers:{"Content-Type":"application/x-www-form-urlencoded"},
-body:username=${signupUser.value}&password=${signupPass.value}
-})
-.then(res=>res.text())
-.then(data=>alert(data));
+function signup() {
+const user = signupUser.value;
+const pass = signupPass.value;
+if(user && pass) {
+localStorage.setItem(user, pass);
+alert("Account created successfully!");
+showLogin();
+ } else {
+alert("Fill all fields");
+ }
 }
-
-function login(){
-fetch("login.php",{
-method:"POST",
-headers:{"Content-Type":"application/x-www-form-urlencoded"},
-body:username=${loginUser.value}&password=${loginPass.value}
-})
-.then(res=>res.text())
-.then(data=>{
-if(data=="success"){
-loginBox.style.display="none";
-courseBox.style.display="block";
-window.currentUser=loginUser.value;
-}else alert("Invalid login");
-});
+function login() {
+const user = loginUser.value;
+const pass = loginPass.value;
+if(localStorage.getItem(user) === pass) {
+loginBox.style.display = "none";
+courseBox.style.display = "block";
+ } else {
+alert("Invalid username or password");
+ }
 }
-
-function recommend(){
-let skill=document.getElementById("skill").value;
-let interest=document.getElementById("interest").value;
-let course="";
-
-if(skill=="Beginner" && interest=="Programming")
-course="Intro to Programming";
-else if(interest=="Data Science")
-course="Data Science Basics";
-else if(interest=="Web Development")
-course="Full Stack Development";
-else
-course="AI & ML Fundamentals";
-
-result.innerHTML="Recommended: "+course;
-
-fetch("save_details.php",{
-method:"POST",
-headers:{"Content-Type":"application/x-www-form-urlencoded"},
-body:username=${window.currentUser}&course=${course}
-});
+function recommend() {
+const skill = document.getElementById("skill").value;
+const interest = document.getElementById("interest").value;
+ let course = "";
+if(skill === "Beginner" && interest === "Programming")
+ course = "Introduction to Programming";
+ else if(interest === "Data Science")
+ course = "Basics of Data Science";
+ else if(interest === "Web Development")
+ course = "Full Stack Web Development";
+ else
+ course = "AI & Machine Learning Fundamentals";
+document.getElementById("result").innerHTML =
+ "✅ Recommended Course:<br>" + course;
 }
 </script>
-
 </body>
 </html>
