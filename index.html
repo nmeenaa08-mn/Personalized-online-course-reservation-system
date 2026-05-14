@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Course Recommendation System</title>
+
+<style>
+body { font-family: Arial; background:#f2f4f7; }
+.container {
+    width: 420px; margin: 40px auto;
+    background:#fff; padding:25px;
+    border-radius:8px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+input, select {
+    width:100%; padding:8px; margin-top:5px;
+}
+button {
+    width:100%; margin-top:15px; padding:10px;
+    background:#007bff; color:white; border:none;
+}
+.link { text-align:center; color:blue; cursor:pointer; }
+#result { margin-top:15px; color:green; text-align:center; }
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="container" id="loginBox">
+<h2>Login</h2>
+<input type="text" id="loginUser" placeholder="Username">
+<input type="password" id="loginPass" placeholder="Password">
+<button onclick="login()">Login</button>
+<div class="link" onclick="showSignup()">New user? Sign up</div>
+</div>
+
+<!-- SIGNUP -->
+<div class="container" id="signupBox" style="display:none;">
+<h2>Sign Up</h2>
+<input type="text" id="signupUser" placeholder="Username">
+<input type="password" id="signupPass" placeholder="Password">
+<button onclick="signup()">Create Account</button>
+<div class="link" onclick="showLogin()">Already have account?</div>
+</div>
+
+<!-- COURSE FORM -->
+<div class="container" id="courseBox" style="display:none;">
+<h2>Course Selection</h2>
+<input type="text" id="name" placeholder="Full Name">
+<input type="email" id="email" placeholder="Email">
+
+<select id="skill">
+<option>Beginner</option>
+<option>Intermediate</option>
+<option>Advanced</option>
+</select>
+
+<select id="interest">
+<option>Programming</option>
+<option>Data Science</option>
+<option>Web Development</option>
+<option>AI & ML</option>
+</select>
+
+<input type="text" id="goal" placeholder="Career Goal">
+
+<button onclick="recommend()">Get Recommendation</button>
+<div id="result"></div>
+</div>
+
+<script>
+function showSignup(){
+loginBox.style.display="none";
+signupBox.style.display="block";
+}
+function showLogin(){
+signupBox.style.display="none";
+loginBox.style.display="block";
+}
+
+function signup(){
+fetch("signup.php",{
+method:"POST",
+headers:{"Content-Type":"application/x-www-form-urlencoded"},
+body:username=${signupUser.value}&password=${signupPass.value}
+})
+.then(res=>res.text())
+.then(data=>alert(data));
+}
+
+function login(){
+fetch("login.php",{
+method:"POST",
+headers:{"Content-Type":"application/x-www-form-urlencoded"},
+body:username=${loginUser.value}&password=${loginPass.value}
+})
+.then(res=>res.text())
+.then(data=>{
+if(data=="success"){
+loginBox.style.display="none";
+courseBox.style.display="block";
+window.currentUser=loginUser.value;
+}else alert("Invalid login");
+});
+}
+
+function recommend(){
+let skill=document.getElementById("skill").value;
+let interest=document.getElementById("interest").value;
+let course="";
+
+if(skill=="Beginner" && interest=="Programming")
+course="Intro to Programming";
+else if(interest=="Data Science")
+course="Data Science Basics";
+else if(interest=="Web Development")
+course="Full Stack Development";
+else
+course="AI & ML Fundamentals";
+
+result.innerHTML="Recommended: "+course;
+
+fetch("save_details.php",{
+method:"POST",
+headers:{"Content-Type":"application/x-www-form-urlencoded"},
+body:username=${window.currentUser}&course=${course}
+});
+}
+</script>
+
+</body>
+</html>
