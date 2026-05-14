@@ -1,0 +1,16 @@
+<?php
+include "db.php";
+
+$username=$_POST['username'];
+$course=$_POST['course'];
+
+$sql="INSERT INTO user_details(username,recommended_course)
+VALUES('$username','$course')";
+
+if($conn->query($sql))
+echo "Saved";
+else
+echo "Error";
+
+$conn->close();
+?>
